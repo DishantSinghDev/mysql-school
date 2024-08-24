@@ -1,4 +1,4 @@
-import Modal from "@/app/components/shared/modal";
+import Modal from "./modal";
 import {
     useState,
     Dispatch,
@@ -7,7 +7,7 @@ import {
     useMemo,
     useEffect,
 } from "react";
-import LoadingDots from "@/app/components/shared/icons/loading-dots";
+import LoadingDots from "./icons/loading-dots";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router"

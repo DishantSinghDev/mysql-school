@@ -1,6 +1,6 @@
 import React from "react";
 import Editor, { OnChange, OnMount } from "@monaco-editor/react";
-import { tableSchema } from "@/app/constants/tableSchema1";
+import { tableSchema } from "../constants/tableSchema1";
 import * as B from "@mobily/ts-belt";
 
 const schemaTableNames = B.pipe(

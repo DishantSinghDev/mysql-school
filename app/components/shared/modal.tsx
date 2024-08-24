@@ -8,7 +8,7 @@ import {
   import FocusTrap from "focus-trap-react";
   import { motion } from "framer-motion";
   import Leaflet from "./leaflet";
-  import useWindowSize from "@/app/hooks/use-window-size";
+  import useWindowSize from "../../hooks/use-window-size";
   
   export default function Modal({
     children,

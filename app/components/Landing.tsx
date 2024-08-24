@@ -3,7 +3,7 @@ import BashEditorWindow from "./BashEditor";
 import PopUpToast, { showSuccessToast, showErrorToast } from "./PopUpToast";
 import "react-toastify/dist/ReactToastify.css";
 import { defineTheme } from "../lib/defineTheme";
-import useKeyPress from "@/app/hooks/useKyePress";
+import useKeyPress from "../hooks/useKyePress";
 import Footer from "./Footer";
 import OutputWindow from "./OutputWindow";
 import OutputDetails from "./OutputDetails";
