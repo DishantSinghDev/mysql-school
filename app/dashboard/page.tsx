@@ -1,13 +1,14 @@
 "use client"
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Ellipsis, Trash2 } from "lucide-react";
+import { Ellipsis, Eye, EyeOff, Plus, Trash2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { Card, Popover, Table } from "flowbite-react";
 import { getLogs, getUsers, updateUser } from "../api/db-api"; // Assume updateUser is your API to save data
 import LoadingDots from "@/components/shared/icons/loading-dots";
 import SignIn from "@/components/SignIn";
 import Balancer from "react-wrap-balancer";
+import AddUser from "@/components/shared/user-add-modal";
 
 interface User {
     id: number;
@@ -34,36 +35,42 @@ export default function Dashboard() {
     const [loadingLogs, setLoadingLogs] = useState(false);
     const [editingUserId, setEditingUserId] = useState<number | null>(null);
     const [editedUser, setEditedUser] = useState<Partial<User>>({});
+    const [isVisible, setIsVisible] = useState(false);
+    const [showAddUser, setShowAddUser] = useState(false)
 
-    useEffect(() => {
-        const fetchLogsNUsers = async () => {
-            setLoadingUsers(true);
-            setLoadingLogs(true);
-            try {
-                const users = await getUsers();
-                setLoadingUsers(false);
-                if (users.userFound) {
-                    setUsers(users.user);
-                    try {
-                        const logs = await getLogs();
-                        setLoadingLogs(false);
-                        if (logs.logsFound) {
-                            setLogs(logs.logs);
-                        } else {
-                            setLogs([]);
-                        }
-                    } catch (error) {
-                        console.error("Error occurred while fetching logs", error);
-                        setLoadingLogs(false);
+    const toggleVisibility = () => {
+        setIsVisible(prev => !prev);
+    };
+
+    const fetchLogsNUsers = async () => {
+        setLoadingUsers(true);
+        setLoadingLogs(true);
+        try {
+            const users = await getUsers();
+            setLoadingUsers(false);
+            if (users.userFound) {
+                setUsers(users.user);
+                try {
+                    const logs = await getLogs();
+                    setLoadingLogs(false);
+                    if (logs.logsFound) {
+                        setLogs(logs.logs);
+                    } else {
+                        setLogs([]);
                     }
-                } else {
-                    setUsers([]);
+                } catch (error) {
+                    console.error("Error occurred while fetching logs", error);
+                    setLoadingLogs(false);
                 }
-            } catch (error) {
-                console.error("Error occurred while fetching users", error);
-                setLoadingUsers(false);
+            } else {
+                setUsers([]);
             }
-        };
+        } catch (error) {
+            console.error("Error occurred while fetching users", error);
+            setLoadingUsers(false);
+        }
+    };
+    useEffect(() => {
 
         if (status === "authenticated" && (role === "manager" || role === "admin")) {
             fetchLogsNUsers();
@@ -103,6 +110,12 @@ export default function Dashboard() {
         }));
     };
 
+    const handleAddSuccess = (bool: boolean) => {
+        if (bool) {
+            fetchLogsNUsers();
+        }
+    } 
+
     if (status === "loading") {
         return (
             <div className="w-full flex items-center h-[100vh] justify-center">
@@ -114,8 +127,9 @@ export default function Dashboard() {
     if (status === "authenticated" && (role === "manager" || role === "admin")) {
         return (
             <div className="w-full flex z-[1000] justify-center">
+                <AddUser showAddUser={showAddUser} setShowAddUser={setShowAddUser} addSuccess={handleAddSuccess} />
+                <SignIn />
                 <div className="container my-20">
-                    <SignIn />
                     <motion.div
                         className="z-10 mb-20 flex flex-col"
                         initial="hidden"
@@ -141,16 +155,21 @@ export default function Dashboard() {
 
                     <div className="flex flex-col md:flex-row w-full gap-5 justify-center">
                         <div className="border bg-gray-50 rounded-md p-3 md:w-fit w-full border-gray-100">
-                            <h1 className="font-bold text-xl mb-4 w-full text-center">
-                                Users
-                            </h1>
+                            <div className="w-full flex flex-row justify-between">
+                                <h1 className="font-bold text-xl mb-4 w-full">
+                                    Users
+                                </h1>
+                                <button className=" hover:bg-gray-100 mb-3 transition duration-100 rounded-sm py-0.5 px-1" onClick={() => setShowAddUser(true)}>
+                                    <Plus />
+                                </button>
+                            </div>
                             {loadingUsers ? (
                                 <div className="flex w-full justify-center items-center">
                                     <LoadingDots />
                                 </div>
                             ) : users.length > 0 ? (
                                 users.map((user) => (
-                                    <Card key={user.id} className="w-full mb-3">
+                                    <Card key={user.id} className="w-full mb-3 dark:bg-white">
                                         <div className="flex flex-row gap-5 items-center py-2 px-3">
                                             {editingUserId === user.id ? (
                                                 <>
@@ -160,58 +179,67 @@ export default function Dashboard() {
                                                             name="username"
                                                             value={editedUser.username || ""}
                                                             onChange={handleInputChange}
-                                                            className="text-xl font-medium text-gray-900 dark:text-white"
+                                                            className="text-xl font-medium text-gray-900 p-2 max-w-fit"
                                                         />
                                                         <input
                                                             type="text"
                                                             name="role"
                                                             value={editedUser.role || ""}
                                                             onChange={handleInputChange}
-                                                            className="text-sm text-gray-500 dark:text-gray-400"
+                                                            className="text-sm text-gray-500 p-2 w-fit"
                                                         />
                                                     </div>
-                                                    
+
                                                     <div>
                                                         {saving ? (
 
-                                                        <button
-                                                        disabled
-                                                            className="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-4 text-center text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-700"
-                                                        >
-                                                            <LoadingDots />
-                                                        </button>
-                                                        ):(
+                                                            <button
+                                                                disabled
+                                                                className="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-4 text-center text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200  "
+                                                            >
+                                                                <LoadingDots />
+                                                            </button>
+                                                        ) : (
 
-                                                        <button
-                                                            className="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-center text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-700"
-                                                            onClick={handleSaveClick}
-                                                        >
-                                                            Save
-                                                        </button>
+                                                            <button
+                                                                className="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-center text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 "
+                                                                onClick={handleSaveClick}
+                                                            >
+                                                                Save
+                                                            </button>
                                                         )}
                                                     </div>
                                                 </>
                                             ) : (
                                                 <>
                                                     <div>
-                                                        <h5 className="text-xl font-medium text-gray-900 dark:text-white">
+                                                        <h5 className="text-xl font-medium text-gray-900 ">
                                                             {user.username}
                                                         </h5>
-                                                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                                                        <span className="text-sm text-gray-500 ">
                                                             {user.role}
                                                         </span>
                                                     </div>
                                                     <div>
-                                                        <h5 className="text-base text-gray-700 dark:text-white">
+                                                        <h5 className="text-base text-gray-700 ">
                                                             {user.email}
                                                         </h5>
-                                                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                                                            {user.password}
-                                                        </span>
+                                                        <div className="relative">
+                                                            <span className="text-[10px] text-gray-500">
+                                                                {isVisible ? user.password : '•'.repeat(user.password.length)}
+                                                            </span>
+                                                            <button
+                                                                type="button"
+                                                                onClick={toggleVisibility}
+                                                                className="absolute right-0 top-0 mt-1.5 mr-2"
+                                                            >
+                                                                {isVisible ? <EyeOff size={16} /> : <Eye size={16} />}
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                     <div className="flex items-center">
                                                         <button
-                                                            className="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-center text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-700"
+                                                            className="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-center text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 "
                                                             onClick={() => handleEditClick(user)}
                                                         >
                                                             Edit

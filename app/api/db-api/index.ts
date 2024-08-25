@@ -65,3 +65,28 @@ export const updateUser = async (id: number, updatedData: { username?: string; r
 
   return response.json();
 };
+
+interface User {
+  username: string;
+  email: string;
+  password: string;
+  db_name: string;
+  role: string;
+}
+
+// Function to create user
+export const addUser = async (userData: User) => {
+  const response = await fetch('/api/server', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ userData, task: 5 }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  return response.json();
+};

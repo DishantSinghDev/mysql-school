@@ -54,7 +54,7 @@ const getOutput = (outputDetails: any) => {
     // Handle any other case (empty data)
     return (
       <pre className="px-2 py-1 font-normal text-xs text-gray-500">
-        No data available.
+        Done with no output.
       </pre>
     );
   }
@@ -66,7 +66,7 @@ const OutputWindow = ({ outputDetails }: any) => {
       <h1 className="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 mb-2">
         Output
       </h1>
-      <div className="w-full h-56  text-white font-normal text-sm overflow-auto">
+      <div className="w-full h-56 border border-gray-100 text-white font-normal text-sm overflow-auto">
         {outputDetails ? getOutput(outputDetails) : null}
       </div>
     </>

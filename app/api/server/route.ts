@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { fetchAndQueryUser, getLogs, getUsers, updateUser } from '../db-modal/db';
+import { addUser, fetchAndQueryUser, getLogs, getUsers, updateUser } from '../db-modal/db';
 
 export async function POST(req: Request) {
   const res = Response;
-  const { email, query, task, id, updatedData } = await req.json();
+  const { email, query, task, id, updatedData, userData } = await req.json();
   if (!task) {
     return res.json({ message: "Invalid task" })
   }
@@ -57,6 +57,20 @@ export async function POST(req: Request) {
       }
       const response = await updateUser(id, updatedData);
       return res.json({ userUpdated: response });
+    } catch (error) {
+      console.error("Error getting users: ", error)
+      return res.json({ message: "Internal server error" })
+    }
+  }else if (task === 5) {
+    try {
+      if (!userData) {
+        return res.json({ message: 'Invalid request' });
+      }
+      const response = await addUser(userData);
+      if (!response) {
+        return res.json({userAdded: false})
+      }
+      return res.json({ userAdded: true, response });
     } catch (error) {
       console.error("Error getting users: ", error)
       return res.json({ message: "Internal server error" })

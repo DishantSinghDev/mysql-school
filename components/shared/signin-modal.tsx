@@ -1,6 +1,7 @@
 import Modal from "./modal";
 import { useState, Dispatch, SetStateAction, useCallback, useMemo } from "react";
 import { signIn } from "next-auth/react";
+import LoadingDots from "./icons/loading-dots";
 
 const SignInModal = ({
     showSignInModal,
@@ -92,7 +93,7 @@ const SignInModal = ({
                         disabled={loading}
                         className={`text-white ${error ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-700 hover:bg-blue-800'} focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:focus:ring-blue-800`}
                     >
-                        {loading ? "Loading..." : "Submit"}
+                        {loading ? <LoadingDots /> : "Submit"}
                     </button>
                 </form>
             </div>
