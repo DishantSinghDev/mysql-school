@@ -7,7 +7,6 @@ import { defineTheme } from "../lib/defineTheme";
 import useKeyPress from "../hooks/useKyePress";
 import Footer from "./Footer";
 import OutputWindow from "./OutputWindow";
-import OutputDetails from "./OutputDetails";
 import ThemeDropdown from "./ThemeDropdown";
 import SignIn from "./SignIn";
 import { useSession } from "next-auth/react";
@@ -71,7 +70,11 @@ const Landing = () => {
     setProcessing(true);
     try {
       const response = await runQuery(email as string, code);
-      setOutputDetails(response);
+      if (!response.queryRan){
+        showErrorToast("Error executing query!");
+        return
+      }
+      setOutputDetails(response.response);
       showSuccessToast("Query executed successfully!");
     } catch (error) {
       showErrorToast("Error executing query!");
@@ -90,7 +93,7 @@ const Landing = () => {
           <ThemeDropdown handleThemeChange={handleThemeChange} theme={theme} />
         </div>
       </div>
-      <div className="flex flex-row space-x-4 items-start px-4 py-4">
+      <div className="flex md:flex-row flex-col space-x-4 items-start px-4 py-4">
         <div className="flex flex-col w-full h-full justify-start items-end">
           <BashEditorWindow
             code={code}
@@ -98,7 +101,7 @@ const Landing = () => {
             theme={theme}
           />
         </div>
-        <div className="right-container flex flex-shrink-0 w-[30%] flex-col">
+        <div className="right-container flex flex-shrink-0 w-full min-w-fit max-w-[90%] md:max-w-[50%] flex-col">
           <OutputWindow outputDetails={outputDetails} />
           <div className="flex flex-col items-end">
             <button
