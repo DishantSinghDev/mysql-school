@@ -1,6 +1,6 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { createDatabase, fetchUserCredentials } from "../../db-modal/db";
+import { createDatabase, createUser, fetchUserCredentials } from "../../db-modal/db";
 
 const authOptions: NextAuthOptions = {
   session: {
@@ -22,28 +22,57 @@ const authOptions: NextAuthOptions = {
         const { email, password } = credentials;
         console.log("Credentials", credentials);
 
-        const user = await fetchUserCredentials(email);
-        console.log("User:", user);
 
-        if (user && user.password === password) {
-          try {
-            const res = await createDatabase(user.db_name);
-            if (!res) {
-              return null;
-            }
-          } catch (error) {
-            console.error("Error creating database:", error);
+        try {
+          const user = await fetchUserCredentials(email);
+          console.log("User:", user);
+
+          if (!user) {
+            console.error("No user found for the provided email.");
             return null;
           }
 
-          return {
-          id: user.id,
-          name: user.username,
-          email: user.email,
-          db_name: user.db_name,
-          role: user.role || "user" // Ensure role is set, default to "user" if not present
-        };
-      }
+          if (user && user.password === password) {
+            try {
+              const res = await createDatabase(user.db_name);
+              if (!res) {
+                return null;
+              }
+              try {
+                const res2 = await createUser(user.username, user.password, user.db_name);
+                if (!res2) {
+                  return null;
+                }
+              } catch (error) {
+                console.error("Error creating user:", error);
+                return null;
+              }
+            } catch (error) {
+              console.error("Error creating database:", error);
+              return null;
+            }
+
+            console.log("User authorized:", {
+              id: user.id,
+              name: user.username,
+              email: user.email,
+              db_name: user.db_name
+            });
+
+            return {
+              id: user.id,
+              name: user.username,
+              email: user.email,
+              db_name: user.db_name,
+              role: user.role || "user" // Ensure role is set, default to "user" if not present
+            };
+          }
+          // Ensure db_name is included
+
+        } catch (error: any) {
+          console.error("Error during authorization:", error.message, error.stack);
+          return null;
+        }
 
         return null; // Return null if authentication fails
       }
@@ -69,6 +98,6 @@ const authOptions: NextAuthOptions = {
 };
 
 
-const headers = NextAuth(authOptions); 
+const headers = NextAuth(authOptions);
 
-export {headers as GET, headers as POST};
+export { headers as GET, headers as POST };
