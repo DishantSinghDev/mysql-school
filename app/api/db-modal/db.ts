@@ -53,7 +53,7 @@ export async function saveLogs(log: string, dbName: string) {
 
 // Function to get logs
 export async function getLogs() {
-  const connection = await mysql.createConnection(remoteConnectionConfig);
+  const connection = await mysql.createConnection(dsSpsConfig);
 
   try {
     // Fetch all logs
@@ -97,6 +97,58 @@ export async function addUser(newUser: any) {
     return true;
   } catch (error: any) {
     console.error('Error adding a new user:', error);
+    return false;
+  } finally {
+    await connection.end();
+  }
+}
+
+// Function to update user
+// Function to update user information
+export async function updateUser(id: number, updatedUser: Partial<{ username: string; email: string; password: string; db_name: string; role: string; }>) {
+  const connection = await mysql.createConnection(dsSpsConfig);
+
+  try {
+    // Construct the SQL query dynamically based on the fields that need to be updated
+    let query = 'UPDATE users SET ';
+    const fields: string[] = [];
+    const values: any[] = [];
+
+    if (updatedUser.username) {
+      fields.push('username = ?');
+      values.push(updatedUser.username);
+    }
+    if (updatedUser.email) {
+      fields.push('email = ?');
+      values.push(updatedUser.email);
+    }
+    if (updatedUser.password) {
+      fields.push('password = ?');
+      values.push(updatedUser.password);
+    }
+    if (updatedUser.db_name) {
+      fields.push('db_name = ?');
+      values.push(updatedUser.db_name);
+    }
+    if (updatedUser.role) {
+      fields.push('role = ?');
+      values.push(updatedUser.role);
+    }
+
+    if (fields.length === 0) {
+      console.log('No fields to update');
+      return false; // No fields to update
+    }
+
+    query += fields.join(', ') + ' WHERE id = ?';
+    values.push(id);
+
+    // Execute the update query
+    await connection.query(query, values);
+    console.log('User updated successfully');
+    return true;
+  } catch (error: any) {
+    console.error('Error updating user:', error.message, error.stack);
     return false;
   } finally {
     await connection.end();

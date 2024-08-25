@@ -32,7 +32,7 @@ export default function SignIn() {
   return (
     <>
       <SignInModal />
-      <div className="absolute right-2 top-5">
+      <div className="absolute z-[100000] right-2 top-5">
         {session ? (
           <Popover
             trigger="click"
