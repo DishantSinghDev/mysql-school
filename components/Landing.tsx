@@ -1,3 +1,4 @@
+'use client'
 import React, { useEffect, useState } from "react";
 import BashEditorWindow from "./BashEditor";
 import PopUpToast, { showSuccessToast, showErrorToast } from "./PopUpToast";
@@ -12,6 +13,7 @@ import SignIn from "./SignIn";
 import { useSession } from "next-auth/react";
 import { OnChange } from "@monaco-editor/react";
 import { SingleValue } from "react-select";
+import { runQuery } from "../app/api/db-api";
 
 // Default code for a new file
 const SQL = `CREATE TABLE Students (
@@ -28,6 +30,7 @@ const Landing = () => {
   const [theme, setTheme] = useState("cobalt");
   const [outputDetails, setOutputDetails] = useState(null);
   const [processing, setProcessing] = useState(false);
+  const {email, db_name} = session?.user || {};
 
   const enterPress = useKeyPress("Enter");
   const ctrlPress = useKeyPress("Control");
@@ -67,15 +70,8 @@ const Landing = () => {
 
     setProcessing(true);
     try {
-      const response = await fetch("/api/query", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ code }),
-      });
-      const data = await response.json();
-      setOutputDetails(data);
+      const response = await runQuery(email as string, code);
+      setOutputDetails(response);
       showSuccessToast("Query executed successfully!");
     } catch (error) {
       showErrorToast("Error executing query!");
@@ -114,7 +110,6 @@ const Landing = () => {
               {processing ? "Processing..." : "Run Query"}
             </button>
           </div>
-          {outputDetails && <OutputDetails outputDetails={outputDetails} />}
         </div>
       </div>
       <Footer />

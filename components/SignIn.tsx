@@ -2,20 +2,30 @@ import { useState } from "react";
 import { Popover, Avatar, Spinner } from "flowbite-react";
 import { LogOut, User } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { useSignInModal } from "./shared/signin-modal";
 
 export default function SignIn() {
   const { data: session, status } = useSession();
-  const [signInClicked, setSignInClicked] = useState(false);
+  const [logOutClicked, setLogOutClicked] = useState(false);
+   const { SignInModal, setShowSignInModal } = useSignInModal();
 
   const logOutUser = async () => {
-    await signOut();
+    try {
+      setLogOutClicked(true);
+      await signOut();
+    }
+    catch (error) {
+      console.error("Failed to log out:", error);
+    }
+    finally {
+      setLogOutClicked(false);
+    }
   };
 
-  const redirectToSignIn = () => {
-    signIn();
-  };
 
   return (
+    <>
+    <SignInModal />
     <div className="absolute right-2 top-5">
       {session ? (
         <Popover
@@ -27,7 +37,7 @@ export default function SignIn() {
                 className="relative flex w-full items-center justify-center md:justify-start space-x-2 rounded-md p-2 text-left text-sm transition-all duration-75 hover:bg-gray-100"
                 onClick={logOutUser}
               >
-                {signInClicked ? (
+                {logOutClicked ? (
                   <div className="relative flex items-center justify-center">
                     <Spinner size="sm" />
                   </div>
@@ -51,7 +61,7 @@ export default function SignIn() {
         </Popover>
       ) : (
         <button
-          onClick={redirectToSignIn}
+          onClick={() => setShowSignInModal(true)}
           type="button"
           className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
           aria-label="SignIn"
@@ -60,5 +70,6 @@ export default function SignIn() {
         </button>
       )}
     </div>
+    </>
   );
 }

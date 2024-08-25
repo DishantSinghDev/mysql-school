@@ -2,6 +2,7 @@ import React from "react";
 import Editor, { OnChange, OnMount } from "@monaco-editor/react";
 import { tableSchema } from "../constants/tableSchema1";
 import * as B from "@mobily/ts-belt";
+import * as monaco from "monaco-editor";
 
 const schemaTableNames = B.pipe(
   tableSchema,
@@ -57,9 +58,9 @@ class MonacoEditor extends React.Component<MonacoEditorProps> {
             label: "myCustomSnippet",
             kind: monaco.languages.CompletionItemKind.Snippet,
             insertText: "This is a piece of custom code",
-            insertTextRules:
-              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-            documentation: "This is a piece of custom code"
+            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+            documentation: "This is a piece of custom code",
+            range: monaco.Range.fromPositions(position, position)
           }
         ];
 
@@ -92,7 +93,8 @@ class MonacoEditor extends React.Component<MonacoEditorProps> {
             ...schemaTableNames.map((table_name) => ({
               label: table_name,
               kind: monaco.languages.CompletionItemKind.Field,
-              insertText: table_name
+              insertText: table_name,
+              range: monaco.Range.fromPositions(position, position)
             }))
           );
         }
@@ -111,7 +113,8 @@ class MonacoEditor extends React.Component<MonacoEditorProps> {
                 .map(({ table_name, column_name }) => ({
                   label: column_name,
                   kind: monaco.languages.CompletionItemKind.Field,
-                  insertText: column_name
+                  insertText: column_name,
+                  range: monaco.Range.fromPositions(position, position)
                 }))
             );
           }

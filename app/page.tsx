@@ -1,15 +1,7 @@
-"use client";
-import { SessionProvider } from "next-auth/react";
-import Landing from "./components/Landing";
+import Landing from "../components/Landing";
 
-export default function Home({
-  session
-}: {
-  session: any;
-}) {
+export default function Home() {
   return (
-    <SessionProvider session={session}>
       <Landing />
-    </SessionProvider>
   );
 }
