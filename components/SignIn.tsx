@@ -40,7 +40,7 @@ export default function SignIn() {
             content={
               <div className="w-full rounded-md bg-white p-2 md:w-56">
                 <div className="relative text-start space-y-2 p-2">
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                  <p className="text-sm font-semibold text-gray-900">
                     {name} <span className="text-xs">
                       ({role})
                     </span>

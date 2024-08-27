@@ -188,7 +188,7 @@ export default function Dashboard() {
                     </motion.div>
 
                     <div className="flex flex-col items-center w-full gap-5 justify-center">
-                        <div className="border bg-gray-50 rounded-md p-3 md:w-fit w-full border-gray-100">
+                        <div className="border bg-gray-50 rounded-md p-3 md:w-fit min-w-[33%] w-full border-gray-100">
                             <div className="w-full flex flex-row justify-between">
                                 <h1 className="font-bold text-xl mb-4 w-full">
                                     Users
@@ -322,7 +322,7 @@ export default function Dashboard() {
                                                                     content={
                                                                         <div className=" w-full rounded-md bg-white p-2 md:w-56">
                                                                             <div className="relative text-start space-y-2 p-2">
-                                                                                <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                                                                                <p className="text-sm font-semibold text-gray-900">
                                                                                     Are you sure you want to Delete the User?
                                                                                 </p>
                                                                             <button disabled={deleting} onClick={() => handleUserDelete(user.email)} className="inline-flex w-full text-center items-center transition duration-100 rounded-lg bg-red-400 px-4 py-2 text-sm font-medium text-white hover:bg-red-300 focus:outline-none focus:ring-4 focus:ring-red-200">
