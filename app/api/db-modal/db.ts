@@ -90,8 +90,28 @@ export async function addUser(newUser: any) {
   try {
     // Insert a new user
     await connection.query(
-      'INSERT INTO users (username, email, password, db_name, role) VALUES (?, ?, ?, ?, ?)',
-      [newUser.username, newUser.email, newUser.password, newUser.db_name, newUser.role]
+      'INSERT INTO users (username, email, password, db_name, role, pin) VALUES (?, ?, ?, ?, ?, ?)',
+      [newUser.username, newUser.email, newUser.password, newUser.db_name, newUser.role, newUser.pin]
+    );
+
+    return true;
+  } catch (error: any) {
+    console.error('Error adding a new user:', error);
+    return false;
+  } finally {
+    await connection.end();
+  }
+}
+
+// Function to delete a new user
+export async function deleteUser(email: string) {
+  const connection = await mysql.createConnection(dsSpsConfig);
+
+  try {
+    // Insert a new user
+    await connection.query(
+      'DELETE FROM users WHERE email = ?',
+      [email]
     );
 
     return true;
@@ -105,7 +125,7 @@ export async function addUser(newUser: any) {
 
 // Function to update user
 // Function to update user information
-export async function updateUser(id: number, updatedUser: Partial<{ username: string; email: string; password: string; db_name: string; role: string; }>) {
+export async function updateUser(id: number, updatedUser: Partial<{ username: string; email: string; password: string; db_name: string; role: string; pin: string; }>) {
   const connection = await mysql.createConnection(dsSpsConfig);
 
   try {
@@ -134,6 +154,11 @@ export async function updateUser(id: number, updatedUser: Partial<{ username: st
       fields.push('role = ?');
       values.push(updatedUser.role);
     }
+    if (updatedUser.pin) {
+      fields.push('pin = ?');
+      values.push(updatedUser.pin);
+    }
+
 
     if (fields.length === 0) {
       console.log('No fields to update');
@@ -309,7 +334,7 @@ export async function fetchUserCredentials(email: string) {
   try {
     // Fetch user credentials from users table based on email
     const [rows]: any = await dsSpsConnection.query(
-      'SELECT id, username, password, db_name, role FROM users WHERE email = ? LIMIT 1',
+      'SELECT id, username, password, db_name, role, pin FROM users WHERE email = ? LIMIT 1',
       [email]
     );
 
@@ -319,8 +344,8 @@ export async function fetchUserCredentials(email: string) {
       return null;
     }
 
-    const { id, username, password, db_name, role } = rows[0];
-    return { id, username, email, password, db_name, role };
+    const { id, username, password, db_name, role, pin } = rows[0];
+    return { id, username, email, password, db_name, role, pin };
   } catch (error: any) {
     console.error('Error fetching user credentials:', error.message, error.stack);
     return null;

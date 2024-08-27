@@ -75,7 +75,6 @@ const Landing = () => {
         return
       }
       setOutputDetails(response.response);
-      showSuccessToast("Query executed successfully!");
     } catch (error) {
       showErrorToast("Error executing query!");
     } finally {
@@ -101,7 +100,7 @@ const Landing = () => {
             theme={theme}
           />
         </div>
-        <div className="right-container flex flex-shrink-0 w-full min-w-fit max-w-[90%] md:max-w-[50%] flex-col">
+        <div className="container flex flex-shrink-0 w-full max-w-[90%] md:max-w-[50%] flex-col">
           <OutputWindow outputDetails={outputDetails} />
           <div className="flex flex-col items-end">
             <button

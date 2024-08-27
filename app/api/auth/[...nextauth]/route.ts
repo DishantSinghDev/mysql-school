@@ -12,16 +12,15 @@ const authOptions: NextAuthOptions = {
       type: "credentials",
       credentials: {
         email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
+        password: { label: "Password", type: "password" },
+        pin: {label: "Pin", type: "password"}
       },
-      async authorize(credentials: Record<"email" | "password", string> | undefined, req: any) {
+      async authorize(credentials: Record<"email" | "password" | "pin", string> | undefined, req: any) {
         if (!credentials) {
           return null; // Handle the case where no credentials are provided
         }
 
-        const { email, password } = credentials;
-        console.log("Credentials", credentials);
-
+        const { email, password, pin } = credentials;
 
         try {
           const user = await fetchUserCredentials(email);
@@ -32,7 +31,7 @@ const authOptions: NextAuthOptions = {
             return null;
           }
 
-          if (user && user.password === password) {
+          if (user && user.password === password && user.pin === pin) {
             try {
               const res = await createDatabase(user.db_name);
               if (!res) {
@@ -51,13 +50,6 @@ const authOptions: NextAuthOptions = {
               console.error("Error creating database:", error);
               return null;
             }
-
-            console.log("User authorized:", {
-              id: user.id,
-              name: user.username,
-              email: user.email,
-              db_name: user.db_name
-            });
 
             return {
               id: user.id,

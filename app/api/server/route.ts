@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { addUser, fetchAndQueryUser, getLogs, getUsers, updateUser } from '../db-modal/db';
+import { addUser, deleteUser, fetchAndQueryUser, getLogs, getUsers, updateUser } from '../db-modal/db';
 
 export async function POST(req: Request) {
   const res = Response;
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
       }
       return res.json({ logsFound: true, logs: response })
     } catch (error) {
-      console.error("Error getting users: ", error)
+      console.error("Error getting logs: ", error)
       return res.json({ message: "Internal server error" })
     }
   } else if (task === 4) {
@@ -58,10 +58,10 @@ export async function POST(req: Request) {
       const response = await updateUser(id, updatedData);
       return res.json({ userUpdated: response });
     } catch (error) {
-      console.error("Error getting users: ", error)
+      console.error("Error updating users: ", error)
       return res.json({ message: "Internal server error" })
     }
-  }else if (task === 5) {
+  } else if (task === 5) {
     try {
       if (!userData) {
         return res.json({ message: 'Invalid request' });
@@ -72,7 +72,21 @@ export async function POST(req: Request) {
       }
       return res.json({ userAdded: true, response });
     } catch (error) {
-      console.error("Error getting users: ", error)
+      console.error("Error adding users: ", error)
+      return res.json({ message: "Internal server error" })
+    }
+  } else if (task === 6) {
+    try {
+      if (!email) {
+        return res.json({ message: 'Invalid request' });
+      }
+      const response = await deleteUser(email);
+      if (!response) {
+        return res.json({userDeleted: false})
+      }
+      return res.json({ userDeleted: true, response });
+    } catch (error) {
+      console.error("Error deleting user: ", error)
       return res.json({ message: "Internal server error" })
     }
   } else {

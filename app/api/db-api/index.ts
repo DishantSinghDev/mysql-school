@@ -90,3 +90,22 @@ export const addUser = async (userData: User) => {
 
   return response.json();
 };
+
+// Function to create user
+export const delUser = async (email: string) => {
+  const response = await fetch('/api/server', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, task: 6 }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  return response.json();
+};
+
+//

@@ -16,9 +16,9 @@ export default function SignIn() {
   const { email, name, role } = session?.user || {};
 
   const logOutUser = async () => {
+    setLogOutClicked(true);
     try {
-      setLogOutClicked(true);
-      await signOut({ callbackUrl: window.location.href }); // No redirection
+      await signOut({ redirect: false });
     }
     catch (error) {
       console.error("Failed to log out:", error);
@@ -39,7 +39,7 @@ export default function SignIn() {
             placement="bottom-end"
             content={
               <div className="w-full rounded-md bg-white p-2 md:w-56">
-                <div className="relative text-start space-x-2 p-2">
+                <div className="relative text-start space-y-2 p-2">
                   <p className="text-sm font-semibold text-gray-900 dark:text-white">
                     {name} <span className="text-xs">
                       ({role})

@@ -15,6 +15,7 @@ const SignInModal = ({
     const [rememberMe, setRememberMe] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [pin, setPin] = useState("")
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -26,6 +27,7 @@ const SignInModal = ({
                 redirect: false,
                 email,
                 password,
+                pin
                 // Other options if needed
             });
 
@@ -51,8 +53,8 @@ const SignInModal = ({
                         We will fetch every data of you from our database to provide the best experience.
                     </p>
                 </div>
-                <form onSubmit={handleSubmit} className="flex flex-col px-4 py-8 space-y-4 bg-gray-50 dark:bg-gray-500 md:px-16">
-                    <div className="mb-5">
+                <form onSubmit={handleSubmit} className="flex flex-col px-4 py-8 space-y-2 bg-gray-50 dark:bg-gray-500 md:px-16">
+                    <div className="mb-1">
                         <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
                         <input
                             type="email"
@@ -60,11 +62,11 @@ const SignInModal = ({
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="name@flowbite.com"
+                            placeholder="name@sps.com"
                             required
                         />
                     </div>
-                    <div className="mb-5">
+                    <div className="mb-1">
                         <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your password</label>
                         <input
                             type="password"
@@ -73,6 +75,17 @@ const SignInModal = ({
                             onChange={(e) => setPassword(e.target.value)}
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                             required
+                        />
+                    </div>
+                    <div className="">
+                        <label htmlFor="pin" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">PIN (Not for students)</label>
+                        <input
+                            type="password"
+                            id="pin"
+                            value={pin}
+                            onChange={(e) => setPin(e.target.value)}
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            
                         />
                     </div>
                     <div className="flex items-start mb-5">
