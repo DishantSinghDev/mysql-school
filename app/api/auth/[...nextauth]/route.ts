@@ -21,6 +21,7 @@ const authOptions: NextAuthOptions = {
         }
 
         const { email, password, pin } = credentials;
+        console.log("pin",pin)
 
         try {
           const user = await fetchUserCredentials(email);

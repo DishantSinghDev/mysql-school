@@ -108,20 +108,41 @@ export async function deleteUser(email: string) {
   const connection = await mysql.createConnection(dsSpsConfig);
 
   try {
-    // Insert a new user
-    await connection.query(
-      'DELETE FROM users WHERE email = ?',
+    // Start a transaction to ensure both operations succeed or fail together
+    await connection.beginTransaction();
+
+    // Delete the user from your application's users table
+    await connection.query('DELETE FROM users WHERE email = ?', [email]);
+
+    // Get the MySQL username associated with the email, if stored in the users table
+    const [rows]: any = await connection.query(
+      'SELECT username FROM users WHERE email = ?',
       [email]
     );
+    if (rows.length > 0) {
+      let mysqlUsername = rows[0].username;
+
+      // Remove spaces, uppercase, lowercase, and special characters from the username
+      mysqlUsername = mysqlUsername.replace(/\s/g, '').replace(/[^a-zA-Z0-9]/g, '');
+
+      // Delete the user from the MySQL user management system
+      await connection.query(`DROP USER IF EXISTS '${mysqlUsername}'@'%'`);
+    }
+
+    // Commit the transaction
+    await connection.commit();
 
     return true;
   } catch (error: any) {
-    console.error('Error adding a new user:', error);
+    // Rollback the transaction in case of an error
+    await connection.rollback();
+    console.error('Error deleting the user:', error);
     return false;
   } finally {
     await connection.end();
   }
 }
+
 
 // Function to update user
 // Function to update user information
@@ -203,12 +224,15 @@ export async function createDatabase(dbName: string) {
 export async function createUser(newUser: string, newPassword: string, dbName: string) {
   const connection = await mysql.createConnection(remoteConnectionConfig);
 
-  // Remove space, uppercase, lowercase, and special characters from name
+  // Remove spaces, uppercase, lowercase, and special characters from name
   newUser = newUser.replace(/\s/g, '').replace(/[^a-zA-Z0-9]/g, '');
 
   try {
     // Check if the user already exists
-    const [rows]: any = await connection.query('SELECT EXISTS(SELECT 1 FROM mysql.user WHERE user = ?) AS userExists', [newUser]);
+    const [rows]: any = await connection.query(
+      'SELECT EXISTS(SELECT 1 FROM mysql.user WHERE user = ?) AS userExists',
+      [newUser]
+    );
     const userExists = rows[0].userExists;
 
     if (userExists) {
@@ -217,22 +241,22 @@ export async function createUser(newUser: string, newPassword: string, dbName: s
     }
 
     // Create the database if it doesn't exist
-    await connection.query('CREATE DATABASE IF NOT EXISTS ??', [dbName]);
+    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\``);
 
     // Create a new user
     await connection.query(
-      'CREATE USER ? IDENTIFIED BY ?',
-      [newUser, newPassword]
+      `CREATE USER '${newUser}'@'%' IDENTIFIED BY ?`,
+      [newPassword]
     );
 
     // Grant all privileges on the specified database
     await connection.query(
-      'GRANT ALL PRIVILEGES ON ??.* TO ?',
-      [dbName, newUser]
+      `GRANT ALL PRIVILEGES ON \`${dbName}\`.* TO '${newUser}'@'%'`
     );
 
     // Apply changes
     await connection.query('FLUSH PRIVILEGES');
+
     return true;
   } catch (error: any) {
     console.error('Error creating database, user, or granting privileges:', error);
@@ -242,6 +266,7 @@ export async function createUser(newUser: string, newPassword: string, dbName: s
     await connection.end();
   }
 }
+
 
 
 
