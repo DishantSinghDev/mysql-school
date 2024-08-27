@@ -196,6 +196,9 @@ export default function Dashboard() {
                                 <button className=" hover:bg-gray-100 mb-3 transition duration-100 rounded-sm py-0.5 px-1" onClick={() => setShowAddUser(true)}>
                                     <Plus />
                                 </button>
+                                <button disabled={loadingUsers} className=" hover:bg-gray-100 mb-3 transition duration-100 rounded-sm py-0.5 px-1" onClick={() => fetchUsers()}>
+                                    <RefreshCw />
+                                </button>
                             </div>
                             {loadingUsers ? (
                                 <div className="flex w-full justify-center items-center">

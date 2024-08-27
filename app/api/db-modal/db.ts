@@ -41,7 +41,7 @@ export async function saveLogs(log: string, dbName: string) {
     );
 
     // Insert a log
-    await connection.query('INSERT INTO logs (message) VALUES (?)', [dbName, log]);
+    await connection.query('INSERT INTO logs (message, db_name) VALUES (?, ?)', [log, dbName]);
     return true;
   } catch (error: any) {
     console.error('Error creating logs table or inserting a log:', error);

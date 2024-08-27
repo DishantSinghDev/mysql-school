@@ -59,17 +59,20 @@ export default function SignIn() {
                     </>
                   </button>
                 </Link>
-                {role === "admin" && (
+                {role === "admin" || role === "manager" ? (
                   <Link href="/dashboard">
                     <button
+                    disabled={dashboardClicked}
                       className="relative flex w-full items-center justify-center md:justify-start space-x-2 rounded-md p-2 text-left text-sm transition-all duration-75 hover:bg-gray-100"
                     >
                       <>
                         <LayoutDashboard className="h-4 w-4" />
-                        <p className="text-sm">Dashboard</p>
+                        {dashboardClicked ?  <LoadingDots className="py-2"/> : <p className="text-sm">Dashboard</p>}
                       </>
                     </button>
                   </Link>
+                ):(
+                  <></>
                 )}
                 <button
                   className="relative flex w-full items-center justify-center md:justify-start space-x-2 rounded-md p-2 text-left text-sm transition-all duration-75 hover:bg-gray-100"
@@ -77,7 +80,7 @@ export default function SignIn() {
                 >
                   {logOutClicked ? (
                     <div className="relative flex items-center justify-center">
-                      <LoadingDots />
+                      <LoadingDots className="py-2"/>
                     </div>
                   ) : (
                     <>
